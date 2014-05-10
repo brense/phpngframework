@@ -1,0 +1,7 @@
+Options +FollowSymlinks
+RewriteEngine On
+
+RewriteRule ^(fonts|css|js|img|tpl)/(.*)?$ public/$1/$2 [QSA]
+
+RewriteCond %{REQUEST_URI} !\.(jpg|png|gif|js|css|phtml|pdf|xml|txt|html|tpl|eot|svg|ttf|woff)$
+RewriteRule ^ app/App.php [QSA]

@@ -1,0 +1,172 @@
+<div class="row" ng-controller="WebsiteController">
+    <div class="col-xs-8">
+        <h1 class="clearfix">Website:
+            <span>{{languagesByIso[lang].native}}</span>
+            <div class="btn-toolbar pull-right" role="toolbar">
+                <div class="btn-group" data-toggle="buttons" style="margin-bottom:1em;">
+                    <label ng-repeat="language in activeLanguages" ng-click="setLanguage(language.iso)" ng-class="{active: lang == language.iso}" class="btn btn-default">
+                        <input type="radio"><img ng-src="img/flags/{{language.iso}}.png" alt="" />
+                    </label>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success"><span class="glyphicon glyphicon-list"></span> Talen beheren</button>
+                </div>
+            </div>
+        </h1>
+        <form class="form-horizontal" role="form" ng-submit="save()">
+            <div class="form-group">
+                <label for="websiteTitle" class="col-sm-3 control-label">Title</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="websiteTitle" ng-model="content.title[lang]" placeholder="Website title">
+                </div>
+            </div>
+            <div ng-repeat="section in content.sections">
+                <hr />
+                <div class="form-group">
+                    <label for="sectionName{{section.name}}" class="col-sm-3 control-label">Naam</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="sectionName{{section.name}}" ng-model="section.name" placeholder="Naam van de sectie" value="{{section.name}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sectionMenu{{section.name}}" class="col-sm-3 control-label">Menu item</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="sectionMenu{{section.name}}" ng-model="section.menu[lang]" placeholder="Naam van de link" value="{{section.menu[lang]}}">
+                    </div>
+                </div>
+                <div ng-repeat="sub in section.sub_sections" class="background {{sub.background}}">
+                    <div class="form-group">
+                        <label for="subBackground{{sub.name}}" class="col-sm-3 control-label">Achtergrond kleur</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="subBackground{{sub.name}}" ng-model="sub.background" placeholder="red, blue, grey or white" value="{{sub.background}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-8">
+                            <textarea class="form-control" rows="10" id="subContent{{sub.name}}" ng-model="sub.content[lang]" placeholder="De inhoud">{{sub.content[lang]}}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="form-group">
+                <label for="websiteFooter" class="col-sm-3 control-label">Footer</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="websiteFooter" ng-model="content.footer[lang]" placeholder="De footer">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-8">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-4">
+        <h2>Onderdelen
+            <div class="btn-group pull-right">
+                <button class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Toevoegen</button>
+            </div>
+        </h2>
+        <p>Sleep de onderdelen in de gewenste volgorde.</p>
+        <ol ui-nested-sortable="sectionsOptions" ng-model="content.sections">
+            <li ng-repeat="section in content.sections" ui-nested-sortable-item>
+                <div style="display:block;" ui-nested-sortable-handle>{{section.name}}</div>
+                <ol ui-nested-sortable="subsectionsOptions" ng-model="section.sub_sections">
+                    <li ng-repeat="subsec in section.sub_sections" ui-nested-sortable-item>
+                        <div style="display:block;" ui-nested-sortable-handle>{{subsec.name}}</div>
+                    </li>
+                </ol>
+            </li>
+        </ol>
+
+        <!--div class="panel panel-default">
+            <div class="panel-body">
+                <h3>Select language</h3>
+                <div class="btn-group" data-toggle="buttons" style="margin-bottom:1em;">
+                    <label ng-repeat="language in activeLanguages" ng-click="setLanguage(language.iso)" ng-class="{active: lang == language.iso}" class="btn btn-default">
+                        <input type="radio"><img ng-src="img/flags/{{language.iso}}.png" alt="" />
+                    </label>
+                </div>
+                <h3>Remove language</h3>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr ng-repeat="language in activeLanguages">
+                            <td>{{language.iso}}</td>
+                            <td>{{language.language}}</td>
+                            <td style="width:1px;"><button ng-click="removeLanguage(language.iso)" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Add language</h3>
+                <form class="form-horizontal" role="form" ng-submit="addLanguage()">
+                    <div class="form-group">
+                        <label for="language" class="col-sm-4 control-label">Language</label>
+                        <div class="col-sm-8">
+                            <select class="form-control selectpicker" id="language" ng-model="newLanguage">
+                                <option value="">Select a language</option>
+                                <option ng-repeat="l in languages" value="{{l.iso}}">{{l.iso}} | {{l.language}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <button type="submit" class="btn btn-success">Add language</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>Website sections</h3>
+                <ol ui-nested-sortable="sectionsOptions" ng-model="content.sections">
+                    <li ng-repeat="section in content.sections" ui-nested-sortable-item>
+                        <div style="display:block;" ui-nested-sortable-handle>{{section.name}}</div>
+                        <ol ui-nested-sortable="subsectionsOptions" ng-model="section.sub_sections">
+                            <li ng-repeat="subsec in section.sub_sections" ui-nested-sortable-item>
+                                <div style="display:block;" ui-nested-sortable-handle>{{subsec.name}}</div>
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+                <h3>Add a section</h3>
+                <form class="form-horizontal" name="addSectionForm" role="form" ng-submit="addSection()">
+                    <div class="form-group">
+                        <label for="sectionName" class="col-sm-4 control-label">Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="sectionName" ng-model="newSection.name" placeholder="Section name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sectionParent" class="col-sm-4 control-label">Parent section</label>
+                        <div class="col-sm-8">
+                            <select class="form-control selectpicker" id="sectionParent" ng-model="newSection.parent">
+                                <option value="">Select a section</option>
+                                <option value="">None</option>
+                                <option ng-repeat="s in content.sections" value="{{s.name}}">{{s.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sectionMenuItem" class="col-sm-4 control-label">Menu item</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="sectionMenuItem" ng-model="newSection.menu[lang]" placeholder="Menu item">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sectionBackground" class="col-sm-4 control-label">Background</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="sectionBackground" ng-model="newSection.background" placeholder="Background color">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <button type="submit" class="btn btn-success">Add section</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div-->
+    </div>
+</div>

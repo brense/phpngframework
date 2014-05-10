@@ -1,0 +1,8 @@
+body { padding:70px 30px 100px 30px; }
+.navbar { border:0; }
+.navbar-collapse { padding:0 30px; }
+.navbar-collapse .navbar-nav.navbar-right:last-child { margin-right:0; }
+.navbar-inverse .navbar-nav > li > a { color:#eee; font-size:16px; padding:18px 22px; }
+.navbar-form { margin:10px 22px; }
+.navbar-inverse .navbar-nav > li > a:hover { background:#428bca; }
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus { background:#428bca; color:#fff; }
