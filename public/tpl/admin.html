@@ -28,15 +28,19 @@
                     <li ng-class="getClass('/content')"><a href="admin/#/content"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;&nbsp;Inhoud</a></li>
                     <li ng-class="getClass('/settings')"><a href="admin/#/settings"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;&nbsp;Instellingen</a></li>
                 </ul>
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left visible-lg" role="search">
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Zoeken">
                     </div>
                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
                 </form>
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right hidden-sm">
                     <li><a href="admin/#/profile"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{user.name}}</a></li>
                     <li><a href="admin/logout"><span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;Logout</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right visible-sm">
+                    <li><a href="admin/#/profile"><span class="glyphicon glyphicon-user"></span></a></li>
+                    <li><a href="admin/logout"><span class="glyphicon glyphicon-off"></span></a></li>
                 </ul>
             </div>
         </div>

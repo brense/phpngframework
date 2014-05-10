@@ -4,33 +4,37 @@ class App {
 
 	private static $_instance;
 	private $_config;
-	private $_routes = array();
 	private $_request;
-	private $_encryptionKey;
-	private $_cipher;
 	private $_session;
 
 	public function __construct(Array $config = array()){
 		// create static instance of self
 		self::$_instance = &$this;
+        
+		// set document root
+		$config['document.root'] = str_replace('framework' . DIRECTORY_SEPARATOR . 'BasicApplication.php', '', __FILE__);
+        
+		// set base uri
+        if(isset($_SERVER['HTTP_HOST'])){
+            $remaining = str_replace(str_replace('/', DIRECTORY_SEPARATOR , $_SERVER['DOCUMENT_ROOT']), '', $config['document.root']);
+		    $config['base.uri'] = 'http://' . $_SERVER['HTTP_HOST'] . str_replace(DIRECTORY_SEPARATOR, '/', $remaining);
+        }
 
-		// save config
+        // set default sources
+        $config['sources'][] = 'app' . DIRECTORY_SEPARATOR;
+		$config['sources'][] = 'app' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+		$config['sources'][] = 'framework' . DIRECTORY_SEPARATOR;
+		$config['sources'][] = 'framework' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+		$config['sources'][] = 'framework' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
+
+        // save config
 		$this->_config = new Config($config);
-		$this->_encryptionKey = $config['encryption.key'];
-		$this->_cipher = $config['encryption.cipher'];
 
 		// display php erros when debugging
 		if($this->_config->debug){
 			error_reporting(E_ALL);
 			ini_set('display_errors', 1);
 		}
-
-		// set document root
-		$this->_config->document_root = str_replace('framework' . DIRECTORY_SEPARATOR . 'BasicApplication.php', '', __FILE__);
-
-		// set base uri
-		$remaining = str_replace(str_replace('/', DIRECTORY_SEPARATOR , $_SERVER['DOCUMENT_ROOT']), '', $this->_config->document_root);
-		$this->_config->base_uri = 'http://' . $_SERVER['HTTP_HOST'] . str_replace(DIRECTORY_SEPARATOR, '/', $remaining);
 
 		// register autoloader
 		if(!isset($this->_config->autoloader))
@@ -66,22 +70,19 @@ class App {
 			// get router and request object
 			$router = new routing\Router();
 			$this->_request = routing\Request::instance();
-
 			// register routes
 			if(isset($config['routes'])){
 				foreach($config['routes'] as $route){
 					$router->registerRoute($route['requestMethod'], $route['route'], $route['callback']);
 				}
 			}
-			
 			// register controllers
-			if(!isset($config['controllers']))
-				$config['controllers'] = array();
-			$router->registerControllers($config['controllers']);
-
+            $sources = array();
+            foreach($config['sources'] as $source)
+                $sources[] = $this->_config->document_root . $source . 'controllers';
+            $router->registerControllers($sources);
 			// start a session
 			$this->_session = new Session();
-			
 			// resolve the route
 			$router->resolveRoute();
 		}
@@ -114,9 +115,9 @@ class App {
 	}
 
 	public static function encrypt($string){
-	    $td = mcrypt_module_open(self::$_instance->_cipher, '', 'ecb', '');
+	    $td = mcrypt_module_open(App::config()->encryption_cipher, '', 'ecb', '');
 	    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    mcrypt_generic_init($td, self::$_instance->_encryptionKey, $iv);
+	    mcrypt_generic_init($td, App::config()->encryption_key, $iv);
 	    $encryptedString = mcrypt_generic($td, $string);
 	    mcrypt_generic_deinit($td);
 	    mcrypt_module_close($td);
@@ -124,9 +125,9 @@ class App {
 	}
 
 	public static function decrypt($encryptedString){
-		$td = mcrypt_module_open(self::$_instance->_cipher, '', 'ecb', '');
+		$td = mcrypt_module_open(App::config()->encryption_cipher, '', 'ecb', '');
 	    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-	    mcrypt_generic_init($td, self::$_instance->_encryptionKey, $iv);
+	    mcrypt_generic_init($td, App::config()->encryption_key, $iv);
 	    $string = mdecrypt_generic($td, $encryptedString);
 	    mcrypt_generic_deinit($td);
 	    mcrypt_module_close($td);
@@ -160,7 +161,16 @@ class App {
 class Config {
 	private $_properties;
 	public function __construct(Array $config = array()){
-		$this->_properties = new StdClass();
+        $this->_properties = new StdClass();
+        if(file_exists($config['document.root'] . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'app.json')){
+            $contents = file_get_contents($config['document.root'] . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'app.json');
+            $json = json_decode($contents);
+            foreach($json as $k => $v){
+                $k = str_replace('.', '_', $k);
+                $v = str_replace('/', DIRECTORY_SEPARATOR, $v);
+                $this->_properties->$k = $v;
+            }
+        }
 		if(isset($config['env'])){
 			if(isset($_SERVER['HTTP_HOST'], $config['env'][$_SERVER['HTTP_HOST']])){
 				foreach($config['env'][$_SERVER['HTTP_HOST']] as $k => $v)
@@ -169,10 +179,8 @@ class Config {
 		}
 		unset($config['env']);
 		foreach($config as $k => $v){
-			if($k != 'controllers' && $k != 'routes'){
-				$k = str_replace('.', '_', $k);
-				$this->_properties->$k = $v;
-			}
+			$k = str_replace('.', '_', $k);
+			$this->_properties->$k = $v;
 		}
 	}
 	public function __get($property){

@@ -1,6 +1,6 @@
 <?php
 
-namespace controllers;
+namespace routing;
 
 abstract class RequestController {
 	public function getRequestMappings(){

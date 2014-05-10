@@ -1,11 +1,25 @@
 html, body { height:100%; background:#fafafa; }
-body { padding:0 4em; font-family:"Open Sans", sans-serif; font-weight:300; font-size:1.5em; }
+body { padding:0; font-family:"Open Sans", sans-serif; font-weight:300; font-size:1.5em; }
 body > .container { padding-top:5em; padding-bottom:5em; line-height:1.6em; }
 
 .navbar-fixed-top .navbar-collapse input { width:150px; }
 
 h1, h2, h3, h4, h5, h6, h7 { font-weight:300; font-family:"Open Sans", sans-serif; }
 .row:first-child h1:first-child, .row:first-child h2:first-child, .row:first-child h3:first-child, .row:first-child h4:first-child, .row:first-child h5:first-child, .row:first-child h6:first-child, .row:first-child h7:first-child { margin-top:0; }
+
+.table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+     background:#f6f6f6;
+}
+
+form.form-inline, form.form-inline .form-group { display: inline-block; line-height: 0; }
+
+.min-width {
+    width: 1px;
+}
+
+.modal-md {
+    width: 450px;
+}
 
 .nestedSortable-list {
 	display: block;

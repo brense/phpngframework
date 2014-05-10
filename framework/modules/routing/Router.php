@@ -22,18 +22,22 @@ class Router {
 		}
 	}
 
-	public function registerControllers($controllers){
-		if($controllers != null){
-			foreach($controllers as $class){
-				$class = '\controllers\\' . $class;
-				$controller = new $class();
-				if($controller instanceof \controllers\RequestController){
-					foreach($controller->getRequestMappings() as $route){
-						$this->registerRoute($route[0], $route[1], $route[2]);
-					}
-				}
-			}
-		}
+	public function registerControllers($sources){
+        foreach($sources as $source){
+            if(is_dir($source) && $handle = opendir($source)){
+                while(false !== ($entry = readdir($handle))){
+                    if(substr($entry, -4, 4) == '.php' && $entry !== 'RequestController.php'){
+                        $class = '\controllers\\' . substr($entry, 0, -4);
+                        $controller = new $class();
+				        if($controller instanceof RequestController){
+					        foreach($controller->getRequestMappings() as $route){
+						        $this->registerRoute($route[0], $route[1], $route[2]);
+					        }
+				        }
+                    }
+                }
+            }
+        }
 	}
 
 	public function registerRoute($requestMethod, $route, $callback){

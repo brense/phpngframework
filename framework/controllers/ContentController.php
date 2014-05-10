@@ -8,7 +8,7 @@ use \Config;
 use \models\Content;
 use \models\Language;
 
-class ContentController extends RequestController {
+class ContentController extends \routing\RequestController {
 	
 	public $route_getContent = array('GET', 'content');
 	public function getContent(){

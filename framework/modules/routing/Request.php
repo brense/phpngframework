@@ -18,38 +18,8 @@ class Request {
 				unset($this->_uri[$i]);
 			}
 		}
-
 		$this->_method = $_SERVER['REQUEST_METHOD'];
-
-		$this->extractRequestParameters();
-	}
-
-	public static function instance(){
-		if(empty(self::$_instance))
-			self::$_instance = new self();
-		return self::$_instance;
-	}
-
-	public function __get($property){
-		if(property_exists($this, '_' . $property))
-			return $this->{'_' . $property};
-		return false;
-	}
-
-	public function __set($property, $value){
-		if(property_exists($this, '_' . $property))
-			$this->{'_' . $property} = $value;
-	}
-
-	public function __isset($property){
-		if(property_exists($this, '_' . $property))
-			return true;
-		return false;
-	}
-
-	private function extractRequestParameters(){
-		$putData = file_get_contents('php://input');
-		
+        $putData = file_get_contents('php://input');
 		switch($this->_method){
 			case 'GET':
 				if(isset($_GET) && count($_GET) > 0){
@@ -76,6 +46,29 @@ class Request {
 				}
 				break;
 		}
+	}
+
+	public static function instance(){
+		if(empty(self::$_instance))
+			self::$_instance = new self();
+		return self::$_instance;
+	}
+
+	public function __get($property){
+		if(property_exists($this, '_' . $property))
+			return $this->{'_' . $property};
+		return false;
+	}
+
+	public function __set($property, $value){
+		if(property_exists($this, '_' . $property))
+			$this->{'_' . $property} = $value;
+	}
+
+	public function __isset($property){
+		if(property_exists($this, '_' . $property))
+			return true;
+		return false;
 	}
 
 }

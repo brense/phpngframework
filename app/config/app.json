@@ -1,0 +1,6 @@
+{
+    "website.title":"My App",
+    "encryption.key":"ISYvCYyZ5HgMuN285aHv",
+    "encryption.cipher":"rijndael-192",
+    "templates.path": "public/tpl/"
+}
